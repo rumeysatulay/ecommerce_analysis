@@ -13,7 +13,9 @@ This dataset comes from a Udemy course, *[Advanced SQL: MySQL for E-commerce Dat
 5. **website_pageviews**: `website_pageview_id`, `created_at`, `website_session_id`, `pageview_url`
 
 ## Project Goals
+In this project, I examined website sessions, the conversion rates from sessions to orders, the stages at which customers drop off during the ordering process, product analysis, and user behavior analysis. The goal was to better understand how to increase profits. As a result, there are several important insights regarding the e-commerce company's performance.
 
 ## Process
+SQL was the cornerstone of my analysis, enabling me to thoroughly examine the data and uncover crucial insights. I used Power BI for visualizing the data.
 
 ## Outcomes
