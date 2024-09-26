@@ -21,11 +21,22 @@ SQL was the cornerstone of my analysis, enabling me to thoroughly examine the da
 ## Outcomes
 
 - When we examine the website session data, it is evident that the gsearch utm_source appears to be the biggest driver of the business. Let's analyze the monthly trends for gsearch sessions and orders to assess growth. Using SQL, we extracted the total number of website sessions and orders by year and month. Using this data, we calculated the conversion rate of sessions to orders. Below, you can see the table and graph related to this analysis. While there is a significant increase in the number of sessions, the increase in the number of orders is much less pronounced. However, the overall conversion rate has also increased over time.
+![2](https://github.com/user-attachments/assets/ceb8140a-c2dc-4d48-8c27-e36ba49c5ce2)
+![1](https://github.com/user-attachments/assets/6f78f360-fd32-4877-b842-48c104c9e9b8)
 
-![2](https://github.com/user-attachments/assets/c3d629be-2a24-48b2-a246-dfb8f46092b7) ![1](https://github.com/user-attachments/assets/b8629d43-ca22-488d-992c-52e8166fcaf5)
 
 - Now I wonder what would happen if I split this analysis into brand and non-brand categories for gsearch. It would be insightful to see whether brand searches are increasing. Brand campaigns represent users who explicitly search for your business in search engines. Therefore, an increase in the conversion rate of brand campaigns is a positive sign for the company and an important improvement to highlight to investors
 
-![3](https://github.com/user-attachments/assets/0082133d-1a6c-4aa6-b6dc-5bc575ebe74a)
+![3](https://github.com/user-attachments/assets/01c42f64-6cbe-4d46-b361-f23f4eb028c8)
+
+
+- Now let's compare the session-to-order conversion rate between mobile and desktop devices. This analysis provides insight into which improvements should be made based on device type. As seen in the table, the conversion rate on desktop is higher, and the increase in conversion rate is also greater for desktop devices compared to mobile. Therefore, if any improvements are to be made, the focus should be on enhancing the desktop user interface, as customers are more likely to place orders from desktop devices.
+
+![4](https://github.com/user-attachments/assets/3ddcce45-6c67-4168-87c4-8dd1fff2f700)
+
+- I analyzed two landing pages (home and lander-1) to show the full conversion funnel from each of these pages to orders. To do this, I focused on the period starting from the launch of the lander page and the following month. I tracked every website session that started with either the home or lander page and followed the corresponding website pageviews for each session. The analysis focused on one product: MrFuzzy. As shown in the graph, the lander page’s conversion rate to orders is as good as the home page’s. Therefore, we can conclude that creating and improving the lander page leads to better outcomes and an increased order rate.
+
+![5](https://github.com/user-attachments/assets/67433887-87b2-42e0-a3c8-e80f10c5fc68)
+
 
 
