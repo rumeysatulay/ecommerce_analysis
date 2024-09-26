@@ -21,6 +21,7 @@ SQL was the cornerstone of my analysis, enabling me to thoroughly examine the da
 ## Outcomes
 
 - When we examine the website session data, it is evident that the gsearch utm_source appears to be the biggest driver of the business. Let's analyze the monthly trends for gsearch sessions and orders to assess growth. Using SQL, we extracted the total number of website sessions and orders by year and month. Using this data, we calculated the conversion rate of sessions to orders. Below, you can see the table and graph related to this analysis. While there is a significant increase in the number of sessions, the increase in the number of orders is much less pronounced. However, the overall conversion rate has also increased over time.
+  
 ![2](https://github.com/user-attachments/assets/ceb8140a-c2dc-4d48-8c27-e36ba49c5ce2)
 ![1](https://github.com/user-attachments/assets/6f78f360-fd32-4877-b842-48c104c9e9b8)
 
