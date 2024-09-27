@@ -39,5 +39,14 @@ SQL was the cornerstone of my analysis, enabling me to thoroughly examine the da
 
 ![5](https://github.com/user-attachments/assets/67433887-87b2-42e0-a3c8-e80f10c5fc68)
 
+- Now let's examine the changes in revenue per order and per session over the years to assess overall business growth. To do this, we extracted the number of sessions, orders, and product prices by year. This allows us to calculate the revenue per order and per session. As shown in the table, the average revenue per order has increased from $49.99 to $62.80 over the past three years. This suggests that customers are likely buying more products over time, assuming product prices remain constant. Additionally, revenue per session has tripled in the same period. This indicates that, over the years, customers who visit the website are increasingly likely to make purchases. This growth is significant and should be shared with stakeholders.
+
+![6](https://github.com/user-attachments/assets/dfa6d2f2-d0d8-474e-81e7-8f340c95aa82)
+
+- Now it's time to examine which channel has experienced the most growth. We have non-brand gsearch, bsearch, organic search orders, and direct search orders. In this analysis, we considered the average orders for each quarter of each year, since the data for 2015 is incomplete, allowing for a fair comparison. As seen in the table, the largest portion of orders comes from the non-brand gsearch channel. Therefore, the majority of improvements and budget should be allocated to this channel. However, it's also important to note that organic and direct search orders have significantly increased over the years, which is a clear sign of success and growth in the business
+
+![7](https://github.com/user-attachments/assets/d5f42c26-e7ec-41ba-a6e2-1c6cd8b1495c)
+
+
 
 
