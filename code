@@ -1,0 +1,233 @@
+-- 1: Gsearch seems to be the biggest driver of our business. SHow monthly trends for gsearch session and orders
+
+SELECT 
+YEAR(ws.created_at) as year_no,
+MONTH(ws.created_at) as month_no,
+COUNT(DISTINCT ws.website_session_id) as sessions,
+COUNT(DISTINCT o.order_id) as orders,
+COUNT(DISTINCT o.order_id)/COUNT(DISTINCT ws.website_session_id) as conv_rate
+FROM website_sessions AS ws LEFT JOIN orders AS o
+ON ws.website_session_id = o.website_session_id
+WHERE ws.utm_source = 'gsearch' 
+GROUP BY 1,2;
+
+-- 2: Make this analysis splitting out nonbrand and brand campaigns separately. 
+
+SELECT 
+YEAR(ws.created_at) as year_no,
+MONTH(ws.created_at) as month_no,
+COUNT(DISTINCT CASE WHEN ws.utm_campaign = 'nonbrand' THEN ws.website_session_id ELSE NULL END) as nonbrand_sessions,
+COUNT(DISTINCT CASE WHEN ws.utm_campaign = 'nonbrand' THEN o.order_id ELSE NULL END) as nonbrand_orders,
+COUNT(DISTINCT CASE WHEN ws.utm_campaign = 'brand' THEN ws.website_session_id ELSE NULL END) as brand_sessions,
+COUNT(DISTINCT CASE WHEN ws.utm_campaign = 'brand' THEN o.order_id ELSE NULL END) as brand_orders,
+COUNT(DISTINCT CASE WHEN ws.utm_campaign = 'nonbrand' THEN o.order_id ELSE NULL END)/COUNT(DISTINCT CASE WHEN ws.utm_campaign = 'nonbrand' THEN ws.website_session_id ELSE NULL END) as nonbrand_conv_rate,
+COUNT(DISTINCT CASE WHEN ws.utm_campaign = 'brand' THEN o.order_id ELSE NULL END)/COUNT(DISTINCT CASE WHEN ws.utm_campaign = 'brand' THEN ws.website_session_id ELSE NULL END) as brand_conv_rate
+FROM website_sessions AS ws LEFT JOIN orders AS o
+ON ws.website_session_id = o.website_session_id
+WHERE ws.utm_source = 'gsearch'
+GROUP BY 1,2;
+
+-- 3: Make this analysis splitting out device type (nonbrand - gsearch). 
+
+SELECT 
+YEAR(ws.created_at) as year_no,
+MONTH(ws.created_at) as month_no,
+COUNT(DISTINCT CASE WHEN ws.device_type = 'mobile' THEN ws.website_session_id ELSE NULL END) as mobile_sessions,
+COUNT(DISTINCT CASE WHEN ws.device_type = 'mobile' THEN o.order_id ELSE NULL END) as mobile_orders,
+COUNT(DISTINCT CASE WHEN ws.device_type = 'desktop' THEN ws.website_session_id ELSE NULL END) as desktop_sessions,
+COUNT(DISTINCT CASE WHEN ws.device_type = 'desktop' THEN o.order_id ELSE NULL END) as desktop_orders,
+COUNT(DISTINCT CASE WHEN ws.device_type = 'mobile' THEN o.order_id ELSE NULL END)/COUNT(DISTINCT CASE WHEN ws.device_type = 'mobile' THEN ws.website_session_id ELSE NULL END) as mobile_conv_rate,
+COUNT(DISTINCT CASE WHEN ws.device_type = 'desktop' THEN o.order_id ELSE NULL END)/COUNT(DISTINCT CASE WHEN ws.device_type = 'desktop' THEN ws.website_session_id ELSE NULL END) as desktop_conv_rate
+FROM website_sessions AS ws LEFT JOIN orders AS o
+ON ws.website_session_id = o.website_session_id
+WHERE ws.utm_source = 'gsearch' AND ws.utm_campaign = 'nonbrand'
+GROUP BY 1,2;
+
+
+-- 4: Funnel test for each of the two pages to order
+
+SELECT
+	ws.website_session_id, 
+    wp.pageview_url, 
+    -- website_pageviews.created_at AS pageview_created_at, 
+    CASE WHEN pageview_url = '/home' THEN 1 ELSE 0 END AS homepage,
+    CASE WHEN pageview_url = '/lander-1' THEN 1 ELSE 0 END AS custom_lander,
+    CASE WHEN pageview_url = '/products' THEN 1 ELSE 0 END AS products_page,
+    CASE WHEN pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS mrfuzzy_page, 
+    CASE WHEN pageview_url = '/cart' THEN 1 ELSE 0 END AS cart_page,
+    CASE WHEN pageview_url = '/shipping' THEN 1 ELSE 0 END AS shipping_page,
+    CASE WHEN pageview_url = '/billing' THEN 1 ELSE 0 END AS billing_page,
+    CASE WHEN pageview_url = '/thank-you-for-your-order' THEN 1 ELSE 0 END AS thankyou_page
+FROM website_sessions AS ws
+	LEFT JOIN website_pageviews AS wp
+		ON ws.website_session_id = wp.website_session_id
+WHERE ws.utm_source = 'gsearch' 
+	AND ws.utm_campaign = 'nonbrand' 
+    AND ws.created_at < '2012-07-28'
+		AND ws.created_at > '2012-06-19'
+ORDER BY 
+	ws.website_session_id,
+    wp.created_at;
+
+CREATE TEMPORARY TABLE session_levels
+SELECT
+	website_session_id, 
+    MAX(homepage) AS saw_homepage, 
+    MAX(custom_lander) AS saw_custom_lander,
+    MAX(products_page) AS product_made_it, 
+    MAX(mrfuzzy_page) AS mrfuzzy_made_it, 
+    MAX(cart_page) AS cart_made_it,
+    MAX(shipping_page) AS shipping_made_it,
+    MAX(billing_page) AS billing_made_it,
+    MAX(thankyou_page) AS thankyou_made_it
+FROM
+(
+SELECT
+	ws.website_session_id, 
+    wp.pageview_url, 
+    -- website_pageviews.created_at AS pageview_created_at, 
+    CASE WHEN pageview_url = '/home' THEN 1 ELSE 0 END AS homepage,
+    CASE WHEN pageview_url = '/lander-1' THEN 1 ELSE 0 END AS custom_lander,
+    CASE WHEN pageview_url = '/products' THEN 1 ELSE 0 END AS products_page,
+    CASE WHEN pageview_url = '/the-original-mr-fuzzy' THEN 1 ELSE 0 END AS mrfuzzy_page, 
+    CASE WHEN pageview_url = '/cart' THEN 1 ELSE 0 END AS cart_page,
+    CASE WHEN pageview_url = '/shipping' THEN 1 ELSE 0 END AS shipping_page,
+    CASE WHEN pageview_url = '/billing' THEN 1 ELSE 0 END AS billing_page,
+    CASE WHEN pageview_url = '/thank-you-for-your-order' THEN 1 ELSE 0 END AS thankyou_page
+FROM website_sessions AS ws
+	LEFT JOIN website_pageviews AS wp
+		ON ws.website_session_id = wp.website_session_id
+WHERE ws.utm_source = 'gsearch' 
+	AND ws.utm_campaign = 'nonbrand' 
+    AND ws.created_at < '2012-07-28'
+		AND ws.created_at > '2012-06-19'
+ORDER BY 
+	ws.website_session_id,
+    wp.created_at
+) as page_analysis
+GROUP BY website_session_id;
+
+select * from session_levels;
+
+SELECT 
+	CASE 
+		WHEN saw_homepage = 1 THEN 'saw_homepage'
+        WHEN saw_custom_lander = 1 THEN 'saw_custom_lander'
+        ELSE 'uh oh... check logic' 
+	END AS segment, 
+    COUNT(DISTINCT website_session_id) AS sessions,
+    COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END) AS to_products,
+    COUNT(DISTINCT CASE WHEN mrfuzzy_made_it = 1 THEN website_session_id ELSE NULL END) AS to_mrfuzzy,
+    COUNT(DISTINCT CASE WHEN cart_made_it = 1 THEN website_session_id ELSE NULL END) AS to_cart,
+    COUNT(DISTINCT CASE WHEN shipping_made_it = 1 THEN website_session_id ELSE NULL END) AS to_shipping,
+    COUNT(DISTINCT CASE WHEN billing_made_it = 1 THEN website_session_id ELSE NULL END) AS to_billing,
+    COUNT(DISTINCT CASE WHEN thankyou_made_it = 1 THEN website_session_id ELSE NULL END) AS to_thankyou
+FROM session_levels
+GROUP BY 1;
+
+SELECT 
+	CASE 
+		WHEN saw_homepage = 1 THEN 'saw_homepage'
+        WHEN saw_custom_lander = 1 THEN 'saw_custom_lander'
+        ELSE 'uh oh... check logic' 
+	END AS segment, 
+    COUNT(DISTINCT website_session_id) AS sessions,
+    COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END)/COUNT(DISTINCT website_session_id) AS to_products,
+    COUNT(DISTINCT CASE WHEN mrfuzzy_made_it = 1 THEN website_session_id ELSE NULL END)/COUNT(DISTINCT CASE WHEN product_made_it = 1 THEN website_session_id ELSE NULL END) AS to_mrfuzzy,
+    COUNT(DISTINCT CASE WHEN cart_made_it = 1 THEN website_session_id ELSE NULL END)/COUNT(DISTINCT CASE WHEN mrfuzzy_made_it = 1 THEN website_session_id ELSE NULL END) AS to_cart,
+    COUNT(DISTINCT CASE WHEN shipping_made_it = 1 THEN website_session_id ELSE NULL END)/COUNT(DISTINCT CASE WHEN cart_made_it = 1 THEN website_session_id ELSE NULL END) AS to_shipping,
+    COUNT(DISTINCT CASE WHEN billing_made_it = 1 THEN website_session_id ELSE NULL END)/COUNT(DISTINCT CASE WHEN shipping_made_it = 1 THEN website_session_id ELSE NULL END) AS to_billing,
+    COUNT(DISTINCT CASE WHEN thankyou_made_it = 1 THEN website_session_id ELSE NULL END)/COUNT(DISTINCT CASE WHEN billing_made_it = 1 THEN website_session_id ELSE NULL END) AS to_thankyou
+FROM session_levels
+GROUP BY 1;
+
+
+/*
+5: Next, let’s showcase seasonality and total revenue for each product.
+
+*/
+
+SELECT
+YEAR(ws.created_at) AS yr,
+QUARTER(ws.created_at) AS qtr,
+COUNT(DISTINCT ws.website_session_id) AS sessions,
+COUNT(DISTINCT o.order_id) AS orders,
+COUNT(DISTINCT o.order_id)/COUNT(DISTINCT ws.website_session_id) AS session_to_order_conv_rate,
+SUM(o.price_usd)/COUNT(DISTINCT o.order_id) AS rev_per_order,
+SUM(o.price_usd)/COUNT(DISTINCT ws.website_session_id) AS rev_session_order
+FROM
+website_sessions AS ws LEFT JOIN orders AS o
+ON ws.website_session_id = o.website_session_id
+GROUP BY 1,2
+ORDER BY 1,2;
+
+/*
+5. We’ve come a long way since the days of selling a single product. Let’s pull monthly trending for revenue 
+and margin by product, along with total sales and revenue. Note anything you notice about seasonality.
+*/
+
+SELECT
+YEAR(created_at) AS yr,
+MONTH(created_at) AS mo,
+SUM(CASE WHEN product_id = 1 THEN price_usd ELSE NULL END) AS 'the_original_mr_fuzzy_rev',
+SUM(CASE WHEN product_id = 1 THEN price_usd-cogs_usd ELSE NULL END) AS 'the_original_mr_fuzzy_mar',
+SUM(CASE WHEN product_id = 2 THEN price_usd ELSE NULL END) AS 'the_forever_love_bear_rev',
+SUM(CASE WHEN product_id = 2 THEN price_usd-cogs_usd ELSE NULL END) AS 'the_forever_love_bear_mar',
+SUM(CASE WHEN product_id = 3 THEN price_usd ELSE NULL END) AS 'the_birthday_sugar_panda_rev',
+SUM(CASE WHEN product_id = 3 THEN price_usd-cogs_usd ELSE NULL END) AS 'the_birthday_sugar_panda_mar',
+SUM(CASE WHEN product_id = 4 THEN price_usd ELSE NULL END) AS 'the_hudson_river_mini_bear_rev',
+SUM(CASE WHEN product_id = 4 THEN price_usd-cogs_usd ELSE NULL END) AS 'the_hudson_river_mini_bear_mar',
+SUM(price_usd) AS total_revenue,
+SUM(price_usd-cogs_usd) AS total_margin
+FROM
+order_items
+GROUP BY 1,2
+ORDER BY 1,2;
+
+
+/*
+6. how how well each product cross-sells from one another.
+*/
+
+CREATE TEMPORARY TABLE primary_product
+SELECT
+order_id,
+product_id,
+is_primary_item
+FROM 
+order_items
+WHERE is_primary_item = 1 AND created_at >= '2014-12-05';
+
+SELECT * FROM primary_product;
+
+CREATE TEMPORARY TABLE cross_sell_product
+SELECT
+order_id,
+product_id,
+is_primary_item
+FROM 
+order_items
+WHERE is_primary_item = 0 AND created_at >= '2014-12-05';
+
+
+SELECT
+primary_product AS primary_product_id,
+COUNT(DISTINCT order_id) AS total_order,
+COUNT(DISTINCT CASE WHEN second_product = 1 THEN order_id ELSE NULL END) AS _xsold_p1,
+COUNT(DISTINCT CASE WHEN second_product = 2 THEN order_id ELSE NULL END) AS _xsold_p2,
+COUNT(DISTINCT CASE WHEN second_product = 3 THEN order_id ELSE NULL END) AS _xsold_p3,
+COUNT(DISTINCT CASE WHEN second_product = 4 THEN order_id ELSE NULL END) AS _xsold_p4,
+COUNT(DISTINCT CASE WHEN second_product = 1 THEN order_id ELSE NULL END)/COUNT(DISTINCT order_id) AS p1_xsell_rt,
+COUNT(DISTINCT CASE WHEN second_product = 2 THEN order_id ELSE NULL END)/COUNT(DISTINCT order_id) AS p2_xsell_rt,
+COUNT(DISTINCT CASE WHEN second_product = 3 THEN order_id ELSE NULL END)/COUNT(DISTINCT order_id) AS p3_xsell_rt,
+COUNT(DISTINCT CASE WHEN second_product = 4 THEN order_id ELSE NULL END)/COUNT(DISTINCT order_id) AS p4_xsell_rt
+FROM(
+SELECT
+pp.order_id AS order_id,
+pp.product_id AS primary_product,
+csp.product_id AS second_product
+FROM
+primary_product AS pp LEFT JOIN cross_sell_product AS csp
+ON pp.order_id = csp.order_id) AS sell_table
+GROUP BY primary_product;
+
