@@ -47,6 +47,16 @@ SQL was the cornerstone of my analysis, enabling me to thoroughly examine the da
 
 ![7](https://github.com/user-attachments/assets/d5f42c26-e7ec-41ba-a6e2-1c6cd8b1495c)
 
+- Now let's examine seasonality, which refers to changes in sales throughout the year. For this analysis, I classified monthly revenue over a span of three years. To do this, I grouped the sales data by month and calculated the average revenue for each. As we can see, both revenue and sales tend to decrease during the summer months, while average revenue nearly doubles in the winter. Therefore, we can conclude that cooler weather encourages customers to purchase these products more frequently
 
+![7](https://github.com/user-attachments/assets/22bf6e68-f3b8-4494-a338-a42b84667dbd)
+
+- I also analyzed which product contributes the most to total revenue. As shown in the pie chart, the largest portion of revenue comes from Mr. Fuzzy with 60%, followed by Love Bear and Sugar Panda with 17% and 15%, respectively. The smallest portion, 8%, belongs to Mini Bear. This order is expected since Mr. Fuzzy has the highest sales volume.
+
+![9](https://github.com/user-attachments/assets/f29874ea-1c3c-4fb4-8373-d38faf37a20d)
+
+- Lastly, let's take a look at cross-selling. This analysis helps us understand if customers who buy a specific product are more likely to purchase another specific product. It also guides us in tailoring advertising strategies for each customer. Based on the table, we can see that customers who buy products 1, 2, and 3 tend to also purchase product 4. However, customers who primarily purchase product 4 are less likely to buy a second product.
+
+![10](https://github.com/user-attachments/assets/139801ba-885f-44ce-9919-5863d603fa7d)
 
 
